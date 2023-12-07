@@ -11,8 +11,8 @@ enum class Type(val value: Int) {
     FIVE_OF_A_KIND(7), FOUR_OF_A_KIND(6), FULL_HOUSE(5), THREE_OF_A_KIND(4), TWO_PAIR(3), ONE_PAIR(2), HIGH_CARD(1), WRONG_CARDS(0);
 
     companion object {
-        fun fromCards(cards: String, useJoker: Boolean = false) : Type {
-            val cardsProcessed = if (useJoker) { translateJokers(cards) } else cards
+        fun fromCards(cards: String, useJokers: Boolean = false) : Type {
+            val cardsProcessed = if (useJokers) { translateJokers(cards) } else cards
             val cardGroups = cardsProcessed.groupingBy { it }.eachCount()
             return when (cardGroups.size) {
                 5 -> HIGH_CARD
