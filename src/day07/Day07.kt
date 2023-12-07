@@ -5,8 +5,6 @@ import readInput
 val cardValueMapping = mapOf('2' to 2,  '3' to 3,  '4' to 4, '5' to 5,  '6' to 6,  '7' to 7, '8' to 8,
                              '9' to 9, 'T' to 10, 'J' to 11, 'Q' to 12, 'K' to 13, 'A' to 14)
 
-val cardValueMappingJoker = cardValueMapping + mapOf('J' to 1)
-
 enum class Type(val value: Int) {
     FIVE_OF_A_KIND(7), FOUR_OF_A_KIND(6), FULL_HOUSE(5), THREE_OF_A_KIND(4), TWO_PAIR(3), ONE_PAIR(2), HIGH_CARD(1), WRONG_CARDS(0);
 
@@ -32,9 +30,7 @@ enum class Type(val value: Int) {
                     .value
                     .map { it.second }
                     .sortedWith(Comparator { o1, o2 ->
-                        cardValueMappingJoker[o2]?.compareTo(
-                            cardValueMappingJoker[o1] ?: -1
-                        )!!
+                        cardValueMapping[o2]?.compareTo(cardValueMapping[o1] ?: -1)!!
                     })[0]
                 cards.replace('J', maxCard)
             } else { cards }
@@ -42,7 +38,7 @@ enum class Type(val value: Int) {
     }
 }
 
-data class Hand(val cards: String, val bid: Long, val useJokers: Boolean = false) : Comparable<Hand> {
+data class Hand(val cards: String, val bid: Long, val useJokers: Boolean = false): Comparable<Hand> {
     private val type : Type = Type.fromCards(cards, useJokers)
 
     override fun compareTo(other: Hand): Int {
@@ -50,9 +46,8 @@ data class Hand(val cards: String, val bid: Long, val useJokers: Boolean = false
 
         // Compare equal hands by pos value
         if (res == 0) {
-            val cardMapper = if (useJokers) { cardValueMappingJoker } else { cardValueMapping }
             for (i in 0..other.cards.length) {
-                val aux = cardMapper[other.cards[i]]?.compareTo(cardMapper[cards[i]]?:-1)!!
+                val aux = getCardValue(other.cards[i], useJokers)?.compareTo(getCardValue(cards[i], useJokers) ?: -1)!!
                 if (aux != 0) {
                     res = aux
                     break
@@ -61,6 +56,10 @@ data class Hand(val cards: String, val bid: Long, val useJokers: Boolean = false
         }
 
         return res
+    }
+
+    private fun getCardValue(card: Char, useJokers: Boolean): Int? {
+        return if ((useJokers) && (card == 'J')) { 1 } else { cardValueMapping[card] }
     }
 }
 
